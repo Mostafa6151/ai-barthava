@@ -23,16 +23,15 @@ export const myProvider = isTestEnvironment
     })
     : customProvider({
       languageModels: {
-        'chat-model': openai('gpt-4'),
+        'chat-model': openai('gpt-4o'),
         'chat-model-reasoning': wrapLanguageModel({
-          model: openai('gpt-4'),
+          model: openai('gpt-4o'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
         'title-model': openai('gpt-3.5-turbo'),
         'artifact-model': openai('gpt-3.5-turbo'),
       },
       imageModels: {
-        // فقط در صورت نیاز اضافه شود
         'small-model': openai.imageModel('dall-e-3'),
       },
     });
