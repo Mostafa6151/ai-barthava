@@ -32,6 +32,7 @@ export const myProvider = isTestEnvironment
         'artifact-model': openai('gpt-3.5-turbo'),
       },
       imageModels: {
+        // فقط در صورت نیاز اضافه شود
         'small-model': openai.imageModel('dall-e-3'),
       },
     });

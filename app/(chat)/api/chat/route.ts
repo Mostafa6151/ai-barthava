@@ -181,7 +181,6 @@ export async function POST(request: Request) {
           },
         });
 
-
         result.consumeStream();
 
         dataStream.merge(
