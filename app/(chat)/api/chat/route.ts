@@ -150,26 +150,26 @@ export async function POST(request: Request) {
     await createStreamId({ streamId, chatId: id });
 
     const stream = createUIMessageStream({
-      execute: ({ writer: dataStream }) => {
+      execute: async ({writer: dataStream}) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
+          system: systemPrompt({selectedChatModel, requestHints}),
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
           experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
-          experimental_transform: smoothStream({ chunking: 'word' }),
+              selectedChatModel === 'chat-model-reasoning'
+                  ? []
+                  : [
+                    'getWeather',
+                    'createDocument',
+                    'updateDocument',
+                    'requestSuggestions',
+                  ],
+          experimental_transform: smoothStream({chunking: 'word'}),
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
+            createDocument: createDocument({session, dataStream}),
+            updateDocument: updateDocument({session, dataStream}),
             requestSuggestions: requestSuggestions({
               session,
               dataStream,
@@ -181,12 +181,25 @@ export async function POST(request: Request) {
           },
         });
 
+
+        try {
+          console.log('⏳ دریافت استریم...');
+
+          for await (const delta of result.textStream) {
+            console.log('🔹 CHUNK:', delta);
+          }
+          console.log('🔸 meta info:', JSON.stringify(result, null, 2));
+        } catch (e) {
+          console.log('🔹 error:', e);
+        }
+
+
         result.consumeStream();
 
         dataStream.merge(
-          result.toUIMessageStream({
-            sendReasoning: true,
-          }),
+            result.toUIMessageStream({
+              sendReasoning: true,
+            }),
         );
       },
       generateId: generateUUID,
